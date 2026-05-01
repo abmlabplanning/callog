@@ -5,7 +5,7 @@
   "main": "dist/app.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
-    "build": "prisma generate && node scripts/setup-db.js && npx tsc",
+    "build": "prisma generate && node scripts/setup-db.js && node_modules/.bin/tsc",
     "postinstall": "prisma generate",
     "start": "node dist/server.js",
     "prisma:migrate": "prisma migrate dev",
