@@ -5,7 +5,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_KEY!
 );
 
-const BUCKET = 'callog-posts';
+const BUCKET = 'callog';
 
 export const uploadToStorage = async (
   buffer: Buffer,
