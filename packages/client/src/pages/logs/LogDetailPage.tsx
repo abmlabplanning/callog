@@ -178,8 +178,6 @@ function HourBlock({ group, onCameraClick, onCommentClick, queryKey }: {
   onCommentClick: (id: string) => void;
   queryKey: unknown[];
 }) {
-  const postedIds = new Set(group.posts.map((p) => p.authorId));
-
   return (
     <section style={blockS.section}>
       <div style={blockS.hourHeader}>
