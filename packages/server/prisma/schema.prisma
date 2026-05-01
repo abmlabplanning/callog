@@ -1,0 +1,126 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  username     String   @unique
+  passwordHash String
+  avatarUrl    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  logMembers    LogMember[]
+  posts         Post[]
+  likes         Like[]
+  comments      Comment[]
+  refreshTokens RefreshToken[]
+
+  @@index([email])
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Log {
+  id          String   @id @default(cuid())
+  name        String
+  inviteCode  String   @unique
+  maxMembers  Int      @default(12)
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members LogMember[]
+  posts   Post[]
+
+  @@index([inviteCode])
+}
+
+model LogMember {
+  id       String   @id @default(cuid())
+  logId    String
+  userId   String
+  role     Role     @default(MEMBER)
+  joinedAt DateTime @default(now())
+
+  log  Log  @relation(fields: [logId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([logId, userId])
+  @@index([logId])
+  @@index([userId])
+}
+
+enum Role {
+  OWNER
+  MEMBER
+}
+
+model Post {
+  id           String    @id @default(cuid())
+  authorId     String
+  logId        String?
+  mediaUrl     String
+  mediaType    MediaType
+  thumbnailUrl String?
+  caption      String?
+  takenAt      DateTime  @default(now())
+  createdAt    DateTime  @default(now())
+
+  author   User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  log      Log?      @relation(fields: [logId], references: [id], onDelete: Cascade)
+  likes    Like[]
+  comments Comment[]
+
+  @@index([logId, takenAt])
+  @@index([authorId, takenAt])
+}
+
+enum MediaType {
+  VIDEO
+  IMAGE
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+  @@index([postId])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  postId    String
+  authorId  String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([postId, createdAt])
+}

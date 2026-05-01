@@ -1,0 +1,157 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
+
+:root {
+  --color-primary: #C94A2B;
+  --color-primary-dark: #8B2500;
+  --color-primary-light: #E8674A;
+  --color-bg: #F5F5F5;
+  --color-icon-bg: #FFF0EB;
+  --color-surface: #FFFFFF;
+  --color-text: #1A1A1A;
+  --color-text-secondary: #888888;
+  --color-border: #E8E8E8;
+  --color-error: #D93025;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
+
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-elevated: 0 4px 16px rgba(0, 0, 0, 0.12);
+
+  --bottom-nav-height: 64px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  background-color: #E0E0E0;
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+#root {
+  display: flex;
+  justify-content: center;
+  min-height: 100%;
+}
+
+.app-container {
+  width: 100%;
+  max-width: 430px;
+  min-height: 100%;
+  background: var(--color-bg);
+  position: relative;
+  overflow-x: hidden;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.15);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+input, textarea {
+  font-family: inherit;
+  outline: none;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+img, video {
+  display: block;
+  max-width: 100%;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 16px;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  transition: background 0.15s;
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-dark);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-outline {
+  width: 100%;
+  padding: 14px;
+  background: transparent;
+  color: var(--color-primary);
+  font-size: 15px;
+  font-weight: 600;
+  border: 1.5px solid var(--color-primary);
+  border-radius: var(--radius-full);
+}
+
+.input-field {
+  width: 100%;
+  padding: 16px 18px;
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 15px;
+  color: var(--color-text);
+  transition: border-color 0.15s;
+}
+
+.input-field:focus {
+  border-color: var(--color-primary);
+}
+
+.input-field::placeholder {
+  color: var(--color-text-secondary);
+}
+
+.card {
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: var(--color-surface);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+* {
+  scrollbar-width: none;
+}
