@@ -1,6 +1,6 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Post } from '../../types';
+import type { Post } from '../../types';
 import Avatar from '../common/Avatar';
 import { toggleLike } from '../../api/posts.api';
 

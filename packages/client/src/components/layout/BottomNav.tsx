@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
 const NAV_ITEMS = [
   { to: '/', label: '홈', icon: HomeIcon },

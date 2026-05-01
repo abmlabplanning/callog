@@ -1,5 +1,5 @@
 import apiClient from './client';
-import { User } from '../types';
+import type { User } from '../types';
 
 export const register = (data: { email: string; username: string; password: string }) =>
   apiClient.post<{ user: User; accessToken: string }>('/auth/register', data);

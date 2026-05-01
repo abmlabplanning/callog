@@ -1,5 +1,5 @@
 import apiClient from './client';
-import { Log } from '../types';
+import type { Log } from '../types';
 
 export const getMyLogs = () => apiClient.get<{ logs: Log[] }>('/logs');
 

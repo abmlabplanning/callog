@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef } from 'react';
 
 export function useIntersectionObserver(callback: () => void, threshold = 0.1) {
   const ref = useRef<HTMLDivElement>(null);

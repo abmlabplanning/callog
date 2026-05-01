@@ -1,5 +1,5 @@
 import apiClient from './client';
-import { Post, Comment } from '../types';
+import type { Post, Comment } from '../types';
 
 export const getLogPosts = (logId: string, cursor?: string, memberId?: string) =>
   apiClient.get<{ posts: Post[]; nextCursor: string | null }>(`/posts/logs/${logId}/posts`, {
