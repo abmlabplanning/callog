@@ -1,5 +1,5 @@
 import prisma from '../../config/database';
-import { uploadToStorage } from '../../config/supabase';
+import { uploadToStorage } from '../../config/storage';
 
 const VLOG_RESET_HOUR = 4;
 
