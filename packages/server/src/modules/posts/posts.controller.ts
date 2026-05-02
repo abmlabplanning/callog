@@ -4,13 +4,14 @@ import * as postsService from './posts.service';
 
 export const getLogPostsController = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { cursor, memberId, limit } = req.query;
+    const { cursor, memberId, limit, date } = req.query;
     const result = await postsService.getLogPosts(
       req.params.logId,
       req.user!.id,
       cursor as string | undefined,
       memberId as string | undefined,
-      limit ? Number(limit) : 20
+      limit ? Number(limit) : 20,
+      date as string | undefined
     );
     res.json(result);
   } catch (err) {

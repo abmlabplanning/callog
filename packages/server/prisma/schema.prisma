@@ -17,11 +17,13 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  logMembers    LogMember[]
-  posts         Post[]
-  likes         Like[]
-  comments      Comment[]
-  refreshTokens RefreshToken[]
+  logMembers       LogMember[]
+  posts            Post[]
+  likes            Like[]
+  comments         Comment[]
+  refreshTokens    RefreshToken[]
+  messages         Message[]
+  messageReactions MessageReaction[]
 
   @@index([email])
 }
@@ -47,8 +49,9 @@ model Log {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  members LogMember[]
-  posts   Post[]
+  members  LogMember[]
+  posts    Post[]
+  messages Message[]
 
   @@index([inviteCode])
 }
@@ -84,10 +87,11 @@ model Post {
   takenAt      DateTime  @default(now())
   createdAt    DateTime  @default(now())
 
-  author   User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  log      Log?      @relation(fields: [logId], references: [id], onDelete: Cascade)
-  likes    Like[]
-  comments Comment[]
+  author       User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  log          Log?      @relation(fields: [logId], references: [id], onDelete: Cascade)
+  likes        Like[]
+  comments     Comment[]
+  chatMessages Message[]
 
   @@index([logId, takenAt])
   @@index([authorId, takenAt])
@@ -123,4 +127,37 @@ model Comment {
   author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
   @@index([postId, createdAt])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  logId     String
+  authorId  String
+  content   String?
+  postId    String?
+  parentId  String?
+  createdAt DateTime @default(now())
+
+  log      Log               @relation(fields: [logId], references: [id], onDelete: Cascade)
+  author   User              @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  post     Post?             @relation(fields: [postId], references: [id], onDelete: SetNull)
+  parent   Message?          @relation("Reply", fields: [parentId], references: [id])
+  replies  Message[]         @relation("Reply")
+  reactions MessageReaction[]
+
+  @@index([logId, createdAt])
+}
+
+model MessageReaction {
+  id        String   @id @default(cuid())
+  messageId String
+  userId    String
+  emoji     String   @default("❤️")
+  createdAt DateTime @default(now())
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId, emoji])
+  @@index([messageId])
 }

@@ -42,7 +42,7 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'grid',
     gridTemplateColumns: 'repeat(4, 1fr)',
     gap: 4,
-    padding: '16px 12px',
+    padding: '16px 16px',
     background: 'var(--color-surface)',
     margin: '8px 0',
   },

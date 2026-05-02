@@ -9,6 +9,7 @@ import LogListPage from './pages/logs/LogListPage';
 import LogCreatePage from './pages/logs/LogCreatePage';
 import LogJoinPage from './pages/logs/LogJoinPage';
 import LogDetailPage from './pages/logs/LogDetailPage';
+import LogChatPage from './pages/logs/LogChatPage';
 import VlogPage from './pages/vlog/VlogPage';
 
 const queryClient = new QueryClient({
@@ -36,6 +37,7 @@ export default function App() {
             <Route path="/logs/create" element={<LogCreatePage />} />
             <Route path="/logs/join" element={<LogJoinPage />} />
             <Route path="/logs/:logId" element={<LogDetailPage />} />
+            <Route path="/logs/:logId/chat" element={<LogChatPage />} />
             <Route path="/vlog" element={<VlogPage />} />
           </Route>
 

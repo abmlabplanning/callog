@@ -8,6 +8,7 @@ import postsRouter from './modules/posts/posts.router';
 import likesRouter from './modules/likes/likes.router';
 import commentsRouter from './modules/comments/comments.router';
 import usersRouter from './modules/users/users.router';
+import chatRouter from './modules/chat/chat.router';
 import { errorMiddleware } from './middlewares/error.middleware';
 
 const app = express();
@@ -31,6 +32,7 @@ app.use('/api/logs', logsRouter);
 app.use('/api/posts', postsRouter);
 app.use('/api/posts/:postId/likes', likesRouter);
 app.use('/api/posts/:postId/comments', commentsRouter);
+app.use('/api', chatRouter);
 
 app.use(errorMiddleware);
 

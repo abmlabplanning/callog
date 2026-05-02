@@ -47,3 +47,26 @@ export interface Comment {
   createdAt: string;
   author: Pick<User, 'id' | 'username' | 'avatarUrl'>;
 }
+
+export interface MessageReactionSummary {
+  emoji: string;
+  count: number;
+  isReacted: boolean;
+}
+
+export interface Message {
+  id: string;
+  logId: string;
+  authorId: string;
+  content?: string | null;
+  postId?: string | null;
+  parentId?: string | null;
+  createdAt: string;
+  author: Pick<User, 'id' | 'username' | 'avatarUrl'>;
+  post?: Pick<Post, 'id' | 'mediaUrl' | 'mediaType' | 'thumbnailUrl' | 'caption' | 'takenAt'> & {
+    author: Pick<User, 'id' | 'username' | 'avatarUrl'>;
+  } | null;
+  parent?: { id: string; content?: string | null; author: Pick<User, 'id' | 'username'> } | null;
+  reactions: MessageReactionSummary[];
+  replyCount: number;
+}

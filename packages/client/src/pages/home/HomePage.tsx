@@ -63,7 +63,7 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: '14px 20px',
+    padding: '14px 16px',
     background: 'var(--color-surface)',
     borderBottom: '1px solid var(--color-border)',
     position: 'sticky',
@@ -102,7 +102,7 @@ const styles: Record<string, React.CSSProperties> = {
   section: {
     background: 'var(--color-surface)',
     marginTop: 8,
-    padding: '16px 20px',
+    padding: '16px 16px',
   },
   sectionHeader: {
     display: 'flex',

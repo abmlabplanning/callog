@@ -1,9 +1,9 @@
 import apiClient from './client';
 import type { Post, Comment } from '../types';
 
-export const getLogPosts = (logId: string, cursor?: string, memberId?: string, limit?: number) =>
+export const getLogPosts = (logId: string, cursor?: string, memberId?: string, limit?: number, date?: string) =>
   apiClient.get<{ posts: Post[]; nextCursor: string | null }>(`/posts/logs/${logId}/posts`, {
-    params: { cursor, memberId, limit },
+    params: { cursor, memberId, limit, date },
   });
 
 export const createLogPost = (logId: string, file: File, caption?: string) => {
