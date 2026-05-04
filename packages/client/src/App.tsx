@@ -30,14 +30,14 @@ export default function App() {
               <Route path="/events" element={<Placeholder title="이벤트" />} />
               <Route path="/calendar" element={<Placeholder title="캘린더" />} />
               <Route path="/ai" element={<Placeholder title="캘박 AI" />} />
+              <Route path="/logs/:logId" element={<LogDetailPage />} />
+              <Route path="/logs/:logId/chat" element={<LogChatPage />} />
             </Route>
 
-            {/* 로그 (하단 탭 없이 풀스크린) */}
+            {/* 로그 목록/생성/참여 (풀스크린) */}
             <Route path="/logs" element={<LogListPage />} />
             <Route path="/logs/create" element={<LogCreatePage />} />
             <Route path="/logs/join" element={<LogJoinPage />} />
-            <Route path="/logs/:logId" element={<LogDetailPage />} />
-            <Route path="/logs/:logId/chat" element={<LogChatPage />} />
             <Route path="/vlog" element={<VlogPage />} />
           </Route>
 

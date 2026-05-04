@@ -199,7 +199,7 @@ function MessageBubble({ msg, isMe, onReact, onReply }: {
 }
 
 const s: Record<string, React.CSSProperties> = {
-  page: { display: 'flex', flexDirection: 'column', height: '100vh', background: 'var(--color-bg)', maxWidth: 430, margin: '0 auto' },
+  page: { display: 'flex', flexDirection: 'column', height: 'calc(100vh - var(--bottom-nav-height))', background: 'var(--color-bg)', maxWidth: 430, margin: '0 auto' },
   header: { display: 'flex', alignItems: 'center', gap: 10, padding: '14px 16px', background: 'var(--color-surface)', borderBottom: '1px solid var(--color-border)', flexShrink: 0 },
   backBtn: { color: 'var(--color-text)', display: 'flex', alignItems: 'center', width: 32 },
   logName: { fontSize: 15, fontWeight: 700 },

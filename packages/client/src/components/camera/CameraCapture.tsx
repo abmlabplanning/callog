@@ -253,7 +253,7 @@ export function MemberSlot({ username, avatarUrl, onClick, isMe }: {
 }
 
 const s: Record<string, React.CSSProperties> = {
-  overlay: { position: 'fixed', inset: 0, background: '#000', zIndex: 100, display: 'flex', flexDirection: 'column' },
+  overlay: { position: 'fixed', inset: 0, background: '#000', zIndex: 200, display: 'flex', flexDirection: 'column' },
   cameraWrap: { display: 'flex', flexDirection: 'column', height: '100%' },
   previewWrap: { display: 'flex', flexDirection: 'column', height: '100%' },
   header: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px', position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10 },
