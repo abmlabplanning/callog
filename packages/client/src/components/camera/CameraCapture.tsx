@@ -63,7 +63,10 @@ export default function CameraCapture({ logs, defaultLogId, queryKey, onClose, o
       : MediaRecorder.isTypeSupported('video/webm')
       ? 'video/webm'
       : 'video/mp4';
-    const recorder = new MediaRecorder(stream, { mimeType });
+    const recorder = new MediaRecorder(stream, {
+      mimeType,
+      videoBitsPerSecond: 2_500_000,  // 2.5Mbps → 4초 영상 ≈ 1.25MB (Vercel 4.5MB 제한 이내)
+    });
     recorderRef.current = recorder;
     recorder.ondataavailable = (e) => { if (e.data.size > 0) chunksRef.current.push(e.data); };
     recorder.onstop = () => {
@@ -105,7 +108,7 @@ export default function CameraCapture({ logs, defaultLogId, queryKey, onClose, o
       queryClient.invalidateQueries({ queryKey: ['posts', selectedLogId] });
       onSuccess();
     },
-    onError: () => setError('업로드에 실패했습니다. 다시 시도해주세요.'),
+    onError: (err) => setError((err as Error).message || '업로드에 실패했습니다. 다시 시도해주세요.'),
   });
 
   const now = new Date();
