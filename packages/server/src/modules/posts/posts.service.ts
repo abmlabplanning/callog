@@ -1,5 +1,5 @@
 import prisma from '../../config/database';
-import { uploadToStorage } from '../../config/storage';
+import { uploadToStorage, getPublicUrl } from '../../config/storage';
 
 const VLOG_RESET_HOUR = 4;
 
@@ -128,6 +128,30 @@ export const getVlogPosts = async (userId: string, cursor?: string, limit = 20) 
   }));
 
   return { posts: items, nextCursor: hasNext ? items[items.length - 1].id : null };
+};
+
+// presigned URL 업로드 후 포스트 레코드 생성 (파일 없이 스토리지 경로로 처리)
+export const createPostFromPath = async (
+  authorId: string,
+  logId: string | null,
+  storagePath: string,
+  mediaType: 'VIDEO' | 'IMAGE',
+  caption?: string
+) => {
+  const mediaUrl = getPublicUrl(storagePath);
+
+  const post = await prisma.post.create({
+    data: { authorId, logId, mediaUrl, mediaType, caption },
+    include: { author: { select: { id: true, username: true, avatarUrl: true } } },
+  });
+
+  if (logId) {
+    await prisma.message.create({
+      data: { logId, authorId, postId: post.id },
+    }).catch(() => {});
+  }
+
+  return post;
 };
 
 export const deletePost = async (postId: string, userId: string) => {

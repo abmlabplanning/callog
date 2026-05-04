@@ -1,6 +1,22 @@
 import { Response } from 'express';
 import { AuthRequest } from '../../middlewares/auth.middleware';
 import * as postsService from './posts.service';
+import { getSignedUploadUrl } from '../../config/storage';
+
+export const signUploadController = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { mimetype } = req.body;
+    if (!mimetype) {
+      res.status(400).json({ error: { code: 'BAD_REQUEST', message: 'mimetype 필요' } });
+      return;
+    }
+    const result = await getSignedUploadUrl(mimetype);
+    res.json(result);
+  } catch (err) {
+    const e = err as Error;
+    res.status(500).json({ error: { code: 'ERROR', message: e.message } });
+  }
+};
 
 export const getLogPostsController = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
@@ -21,12 +37,25 @@ export const getLogPostsController = async (req: AuthRequest, res: Response): Pr
 };
 
 export const createLogPostController = async (req: AuthRequest, res: Response): Promise<void> => {
-  if (!req.file) {
-    res.status(400).json({ error: { code: 'NO_FILE', message: '파일을 업로드해주세요.' } });
-    return;
-  }
   try {
-    const post = await postsService.createPost(req.user!.id, req.params.logId, req.file, req.body.caption);
+    let post;
+    if (req.body.path) {
+      // presigned URL 업로드 후 경로 기반 생성
+      const { path, mediaType, caption } = req.body;
+      post = await postsService.createPostFromPath(
+        req.user!.id,
+        req.params.logId,
+        path,
+        (mediaType as 'VIDEO' | 'IMAGE') || 'VIDEO',
+        caption
+      );
+    } else if (req.file) {
+      // legacy multipart 업로드
+      post = await postsService.createPost(req.user!.id, req.params.logId, req.file, req.body.caption);
+    } else {
+      res.status(400).json({ error: { code: 'NO_FILE', message: '파일을 업로드해주세요.' } });
+      return;
+    }
     res.status(201).json({ post });
   } catch (err) {
     const e = err as Error & { status?: number };
@@ -45,12 +74,28 @@ export const getVlogPostsController = async (req: AuthRequest, res: Response): P
 };
 
 export const createVlogPostController = async (req: AuthRequest, res: Response): Promise<void> => {
-  if (!req.file) {
-    res.status(400).json({ error: { code: 'NO_FILE', message: '파일을 업로드해주세요.' } });
-    return;
+  try {
+    let post;
+    if (req.body.path) {
+      const { path, mediaType, caption } = req.body;
+      post = await postsService.createPostFromPath(
+        req.user!.id,
+        null,
+        path,
+        (mediaType as 'VIDEO' | 'IMAGE') || 'VIDEO',
+        caption
+      );
+    } else if (req.file) {
+      post = await postsService.createPost(req.user!.id, null, req.file, req.body.caption);
+    } else {
+      res.status(400).json({ error: { code: 'NO_FILE', message: '파일을 업로드해주세요.' } });
+      return;
+    }
+    res.status(201).json({ post });
+  } catch (err) {
+    const e = err as Error;
+    res.status(500).json({ error: { code: 'ERROR', message: e.message } });
   }
-  const post = await postsService.createPost(req.user!.id, null, req.file, req.body.caption);
-  res.status(201).json({ post });
 };
 
 export const deletePostController = async (req: AuthRequest, res: Response): Promise<void> => {

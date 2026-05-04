@@ -24,3 +24,23 @@ export const uploadToStorage = async (
   const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
   return data.publicUrl;
 };
+
+// 클라이언트 직접 업로드용 서명 URL (Vercel 4.5MB 제한 우회)
+export const getSignedUploadUrl = async (
+  mimetype: string
+): Promise<{ signedUrl: string; path: string }> => {
+  const ext = mimetype.split('/')[1]?.split(';')[0] || 'bin';
+  const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+
+  const { data, error } = await supabase.storage
+    .from(BUCKET)
+    .createSignedUploadUrl(path);
+
+  if (error || !data) throw new Error(`서명 URL 생성 실패: ${error?.message}`);
+  return { signedUrl: data.signedUrl, path: data.path };
+};
+
+export const getPublicUrl = (path: string): string => {
+  const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
+  return data.publicUrl;
+};

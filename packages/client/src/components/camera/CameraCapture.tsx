@@ -125,53 +125,82 @@ export default function CameraCapture({ logs, defaultLogId, queryKey, onClose, o
 
   // 미리보기 화면
   if (phase === 'preview' && videoUrl) {
+    const selectedLog = logs.find((l) => l.id === selectedLogId);
     return (
       <div style={s.overlay}>
-        <div style={s.previewWrap}>
-          {/* 헤더 */}
-          <div style={s.header}>
-            <button onClick={onClose} style={s.iconBtn}>✕</button>
-            <span style={{ color: '#fff', fontWeight: 700, fontSize: 16 }}>미리보기</span>
-            <div style={{ width: 32 }} />
-          </div>
-
-          {/* 비디오 미리보기 */}
-          <div style={{ position: 'relative', flex: 1, background: '#000' }}>
-            <video ref={previewRef} src={videoUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              autoPlay loop muted playsInline />
-            <div style={s.timeOverlay}>{timeLabel}</div>
-          </div>
-
-          {/* 캡션 + 로그 선택 */}
-          <div style={s.bottomSheet}>
-            {logs.length > 1 && !defaultLogId && (
-              <div style={{ marginBottom: 16 }}>
-                <p style={s.label}>어느 로그에 올릴까요?</p>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  {logs.map((log) => (
-                    <button key={log.id} onClick={() => setSelectedLogId(log.id)}
-                      style={{ ...s.logChip, background: selectedLogId === log.id ? 'var(--color-primary)' : 'var(--color-bg)', color: selectedLogId === log.id ? '#fff' : 'var(--color-text)' }}>
-                      {log.name}
-                    </button>
-                  ))}
-                </div>
-              </div>
+        {/* 헤더 (절대 위치) */}
+        <div style={s.previewHeader}>
+          <button onClick={onClose} style={s.iconBtn}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5">
+              <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+          <span style={s.previewTitle}>{selectedLog?.name ?? '로그'}</span>
+          <button
+            onClick={() => upload()}
+            disabled={isPending}
+            style={{ ...s.sendBtn, opacity: isPending ? 0.5 : 1 }}
+          >
+            {isPending ? (
+              <span style={{ color: '#fff', fontSize: 13 }}>...</span>
+            ) : (
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5">
+                <line x1="12" y1="19" x2="12" y2="5" />
+                <polyline points="5 12 12 5 19 12" />
+              </svg>
             )}
-            <input
-              style={s.captionInput}
-              placeholder={`${timeLabel} 지금 이 순간을 표현하면?`}
-              value={caption}
-              onChange={(e) => setCaption(e.target.value)}
-            />
-            {error && <p style={{ color: '#e00', fontSize: 13, marginTop: 8 }}>{error}</p>}
-            <button
-              style={{ ...s.submitBtn, opacity: isPending ? 0.6 : 1 }}
-              disabled={isPending}
-              onClick={() => upload()}
-            >
-              {isPending ? '업로드 중...' : '공유하기'}
-            </button>
+          </button>
+        </div>
+
+        {/* 영상 (캡션 오버레이 포함) */}
+        <div style={s.videoArea}>
+          <video
+            ref={previewRef}
+            src={videoUrl}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            autoPlay loop muted playsInline
+          />
+          <div style={s.timeOverlay}>{timeLabel}</div>
+          {caption ? (
+            <div style={s.captionOverlay}>
+              <span style={s.captionOnVideo}>{caption}</span>
+            </div>
+          ) : null}
+        </div>
+
+        {/* 하단: 로그 선택 + 캡션 입력 */}
+        <div style={s.bottomSheet}>
+          <p style={s.logSectionLabel}>보낼 로그방:</p>
+          <div style={s.logList}>
+            {logs.map((log) => {
+              const isSel = log.id === selectedLogId;
+              const memberNames = log.members?.map((m) => m.user.username).join(', ') ?? '';
+              return (
+                <button key={log.id} onClick={() => setSelectedLogId(log.id)} style={s.logRow}>
+                  <div style={{ ...s.radioCircle, background: isSel ? 'var(--color-primary)' : 'transparent', borderColor: isSel ? 'var(--color-primary)' : '#555' }}>
+                    {isSel && (
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    )}
+                  </div>
+                  <div style={{ flex: 1, textAlign: 'left' }}>
+                    <p style={s.logRowName}>{log.name}</p>
+                    {memberNames && <p style={s.logRowMembers}>{memberNames}</p>}
+                  </div>
+                </button>
+              );
+            })}
           </div>
+
+          {error && <p style={{ color: '#f55', fontSize: 13, marginBottom: 8 }}>{error}</p>}
+
+          <input
+            style={s.captionInput}
+            placeholder={`${timeLabel} 지금 이 순간은?`}
+            value={caption}
+            onChange={(e) => setCaption(e.target.value)}
+          />
         </div>
       </div>
     );
@@ -255,21 +284,67 @@ export function MemberSlot({ username, avatarUrl, onClick, isMe }: {
 const s: Record<string, React.CSSProperties> = {
   overlay: { position: 'fixed', inset: 0, background: '#000', zIndex: 200, display: 'flex', flexDirection: 'column' },
   cameraWrap: { display: 'flex', flexDirection: 'column', height: '100%' },
-  previewWrap: { display: 'flex', flexDirection: 'column', height: '100%' },
+  // 미리보기 헤더 (absolute, 영상 위에 오버레이)
+  previewHeader: {
+    position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10,
+    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+    padding: '14px 16px',
+    background: 'linear-gradient(rgba(0,0,0,0.5) 0%, transparent 100%)',
+  },
+  previewTitle: { color: '#fff', fontWeight: 700, fontSize: 16, flex: 1, textAlign: 'center' },
+  sendBtn: {
+    width: 40, height: 40, borderRadius: '50%',
+    background: 'var(--color-primary)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+  },
+  // 영상 영역: 화면의 약 55%
+  videoArea: { position: 'relative', width: '100%', height: '55%', background: '#000', flexShrink: 0 },
+  // 타임스탬프 오버레이 (세로 쓰기)
+  timeOverlay: { position: 'absolute', bottom: 24, left: '50%', transform: 'translateX(-50%)', color: '#fff', fontSize: 32, fontWeight: 900, letterSpacing: 2, textShadow: '0 2px 8px rgba(0,0,0,0.7)', fontVariantNumeric: 'tabular-nums', writingMode: 'vertical-rl', textOrientation: 'mixed' },
+  // 캡션 오버레이: 영상 하단 30% 위치에 실시간 표시
+  captionOverlay: {
+    position: 'absolute', bottom: '20%', left: 0, right: 0,
+    display: 'flex', justifyContent: 'center', padding: '0 20px',
+    pointerEvents: 'none',
+  },
+  captionOnVideo: {
+    color: '#fff', fontSize: 18, fontWeight: 700,
+    textShadow: '0 2px 8px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,1)',
+    textAlign: 'center', lineHeight: 1.4, wordBreak: 'break-word',
+  },
+  // 하단 시트
+  bottomSheet: { flex: 1, background: '#111', display: 'flex', flexDirection: 'column', padding: '12px 16px 24px', overflowY: 'auto' },
+  logSectionLabel: { color: 'rgba(255,255,255,0.5)', fontSize: 12, marginBottom: 8 },
+  logList: { display: 'flex', flexDirection: 'column', gap: 2, marginBottom: 12 },
+  logRow: {
+    display: 'flex', alignItems: 'center', gap: 12,
+    padding: '10px 12px', borderRadius: 12,
+    background: 'rgba(255,255,255,0.05)',
+  },
+  radioCircle: {
+    width: 22, height: 22, borderRadius: '50%',
+    border: '2px solid', flexShrink: 0,
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+  },
+  logRowName: { color: '#fff', fontSize: 15, fontWeight: 700 },
+  logRowMembers: { color: 'rgba(255,255,255,0.45)', fontSize: 12, marginTop: 1 },
+  // 캡션 입력창
+  captionInput: {
+    width: '100%', background: 'rgba(255,255,255,0.1)', border: 'none',
+    borderRadius: 12, padding: '12px 16px', color: '#fff', fontSize: 14,
+    boxSizing: 'border-box', marginTop: 'auto',
+  },
+  // 카메라 화면 공통
   header: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px', position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10 },
   iconBtn: { color: '#fff', fontSize: 20, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center' },
-  timeOverlay: { position: 'absolute', bottom: 24, left: '50%', transform: 'translateX(-50%)', color: '#fff', fontSize: 32, fontWeight: 900, letterSpacing: 2, textShadow: '0 2px 8px rgba(0,0,0,0.7)', fontVariantNumeric: 'tabular-nums', writingMode: 'vertical-rl', textOrientation: 'mixed' },
   countdownOverlay: { position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', color: '#fff', fontSize: 80, fontWeight: 900, textShadow: '0 4px 16px rgba(0,0,0,0.8)', opacity: 0.85 },
   progressBar: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 4, background: 'rgba(255,255,255,0.3)' },
   progressFill: { height: '100%', background: 'var(--color-primary)', transition: 'width 0.9s linear' },
   controlRow: { height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#000' },
   recordBtn: { width: 72, height: 72, borderRadius: '50%', border: '4px solid #fff', display: 'flex', alignItems: 'center', justifyContent: 'center' },
   recordInner: { width: 52, height: 52, borderRadius: '50%', background: 'var(--color-primary)' },
-  bottomSheet: { padding: '20px 20px 36px', background: '#111' },
   label: { color: 'rgba(255,255,255,0.7)', fontSize: 13, marginBottom: 10 },
   logChip: { padding: '6px 14px', borderRadius: 20, fontSize: 13, fontWeight: 600 },
-  captionInput: { width: '100%', background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 12, padding: '12px 16px', color: '#fff', fontSize: 14, boxSizing: 'border-box' },
-  submitBtn: { marginTop: 14, width: '100%', height: 50, borderRadius: 25, background: 'var(--color-primary)', color: '#fff', fontSize: 16, fontWeight: 700 },
   closeBtn: { padding: '10px 28px', background: 'rgba(255,255,255,0.2)', color: '#fff', borderRadius: 20, fontSize: 15 },
   errorBox: { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' },
 };
