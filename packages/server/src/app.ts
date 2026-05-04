@@ -25,6 +25,11 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
+app.get('/debug/env', (_req, res) => {
+  const key = process.env.SUPABASE_SERVICE_KEY || '';
+  const url = process.env.SUPABASE_URL || '';
+  res.json({ keyLen: key.length, keyStart: key.slice(0, 20), keyEnd: key.slice(-10), url });
+});
 
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
