@@ -340,6 +340,7 @@ function MemberCell({ member, post, isMe, queryKey, onPostClick, onCameraClick }
           <img src={post.mediaUrl} alt="" style={cs.media} />
         )}
         <div style={cs.nameBar}>
+          {post.caption && <span style={cs.caption}>{post.caption}</span>}
           <span style={cs.username}>{member.username}</span>
         </div>
         <button
@@ -492,10 +493,16 @@ const cs: Record<string, React.CSSProperties> = {
   media: { width: '100%', height: '100%', objectFit: 'cover' },
   nameBar: {
     position: 'absolute', bottom: 0, left: 0, right: 0,
-    padding: '18px 8px 6px',
-    background: 'linear-gradient(transparent, rgba(0,0,0,0.65))',
+    padding: '28px 8px 8px',
+    background: 'linear-gradient(transparent, rgba(0,0,0,0.75))',
   },
-  username: { color: '#fff', fontSize: 11, fontWeight: 700 },
+  caption: {
+    display: 'block', color: '#fff', fontSize: 12, fontWeight: 600,
+    marginBottom: 2, lineHeight: 1.3,
+    textShadow: '0 1px 4px rgba(0,0,0,0.8)',
+    wordBreak: 'break-word',
+  },
+  username: { color: 'rgba(255,255,255,0.75)', fontSize: 10, fontWeight: 600 },
   heartBtn: {
     position: 'absolute', bottom: 6, right: 6,
     background: 'rgba(0,0,0,0.4)', borderRadius: '50%',
